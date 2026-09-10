@@ -10,6 +10,12 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/blogs', [BlogController::class, 'index']);
 Route::get('/blogs/{blog}', [BlogController::class, 'show']);
 
+Route::get('/test', function () {
+    return response()->json([
+        'message' => 'Blog API is working!',
+    ]);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user', [AuthController::class, 'user']);
