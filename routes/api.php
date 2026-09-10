@@ -16,6 +16,12 @@ Route::get('/test', function () {
     ]);
 });
 
+Route::get('/abdo', function () {
+    return response()->json([
+        'message' => 'Hello, Abdo!',
+    ]);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user', [AuthController::class, 'user']);
