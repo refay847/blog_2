@@ -16,10 +16,8 @@ Route::get('/test', function () {
     ]);
 });
 
-Route::get('/abdo', function () {
-    return response()->json([
-        'message' => 'I love you baby girl',
-    ]);
+Route::get('/soso', function () {
+    return view('welcome');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
