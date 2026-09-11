@@ -242,7 +242,7 @@
     <div class="love-message">
       <span class="word">I</span>
       <span class="word">Love</span>
-      <span class="word soso-love">Soso</span>
+      <span class="word">Soso</span>
     </div>
     <div class="signature">💖 forever & always 💖</div>
   </div>
