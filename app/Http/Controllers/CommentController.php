@@ -18,7 +18,7 @@ class CommentController extends Controller
             'body' => $validated['body'],
         ]);
 
-        $comment->load('user');
+        $comment->load('user:id,name');
 
         return response()->json([
             'message' => 'Comment added successfully.',
@@ -26,8 +26,42 @@ class CommentController extends Controller
         ], 201);
     }
 
-    public function destroy(Request $request, Blog $blog, $comment)
-    {
+    public function update(
+        Request $request,
+        Blog $blog,
+        $comment
+    ) {
+        $comment = $blog->comments()
+            ->where('id', $comment)
+            ->firstOrFail();
+
+        if ($comment->user_id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'You can only edit your own comments.',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'body' => ['required', 'string', 'max:1000'],
+        ]);
+
+        $comment->update([
+            'body' => $validated['body'],
+        ]);
+
+        $comment->load('user:id,name');
+
+        return response()->json([
+            'message' => 'Comment updated successfully.',
+            'comment' => $comment,
+        ]);
+    }
+
+    public function destroy(
+        Request $request,
+        Blog $blog,
+        $comment
+    ) {
         $comment = $blog->comments()
             ->where('id', $comment)
             ->firstOrFail();
