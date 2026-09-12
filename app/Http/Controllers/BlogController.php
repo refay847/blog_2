@@ -8,11 +8,25 @@ use Illuminate\Support\Facades\Storage;
 
 class BlogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $blogs = Blog::with('user:id,name')
+        $blogs = Blog::with([
+                'user:id,name',
+                'comments.user:id,name',
+            ])
+            ->withCount([
+                'likes',
+                'comments',
+            ])
             ->latest()
             ->get();
+
+        // Add whether the currently authenticated user liked each blog.
+        foreach ($blogs as $blog) {
+            $blog->is_liked = $blog->likes()
+                ->where('user_id', $request->user()->id)
+                ->exists();
+        }
 
         return response()->json([
             'blogs' => $blogs,
@@ -40,16 +54,42 @@ class BlogController extends Controller
             'img' => $imagePath,
         ]);
 
+        $blog->load([
+            'user:id,name',
+            'comments.user:id,name',
+        ]);
+
+        $blog->loadCount([
+            'likes',
+            'comments',
+        ]);
+
+        $blog->is_liked = false;
+
         return response()->json([
             'message' => 'Blog created successfully',
-            'blog' => $blog->load('user:id,name'),
+            'blog' => $blog,
         ], 201);
     }
 
-    public function show(Blog $blog)
+    public function show(Request $request, Blog $blog)
     {
+        $blog->load([
+            'user:id,name',
+            'comments.user:id,name',
+        ]);
+
+        $blog->loadCount([
+            'likes',
+            'comments',
+        ]);
+
+        $blog->is_liked = $blog->likes()
+            ->where('user_id', $request->user()->id)
+            ->exists();
+
         return response()->json([
-            'blog' => $blog->load('user:id,name'),
+            'blog' => $blog,
         ]);
     }
 
@@ -86,9 +126,23 @@ class BlogController extends Controller
 
         $blog->save();
 
+        $blog->load([
+            'user:id,name',
+            'comments.user:id,name',
+        ]);
+
+        $blog->loadCount([
+            'likes',
+            'comments',
+        ]);
+
+        $blog->is_liked = $blog->likes()
+            ->where('user_id', $request->user()->id)
+            ->exists();
+
         return response()->json([
             'message' => 'Blog updated successfully',
-            'blog' => $blog->load('user:id,name'),
+            'blog' => $blog,
         ]);
     }
 
